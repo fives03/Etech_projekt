@@ -3,13 +3,18 @@ import numpy as np
 import matplotlib.animation as animation
 import math as m
 import sys
+import tkinter as tk
+import re
 
-VOLTAGE = float(sys.argv[1]) # the initial Voltage the experiment starts with
-WAVE_RES = float(sys.argv[2]) # wave resintance of the test setup
-REFLECT_RES_0 = int(sys.argv[3]) # the resistence at the start of the measuring range
+root = tk.Tk()
+
+VOLTAGE = 0.0 #float(sys.argv[1]) # the initial Voltage the experiment starts with
+WAVE_RES = 0.0 #float(sys.argv[2]) # wave resintance of the test setup
+REFLECT_RES_0 = 0.0 #int(sys.argv[3]) # the resistence at the start of the measuring range
 REFLECT_RES_l = 9*10e100 # the resistence at the end of the measuring range
-LENGTH = float(sys.argv[4])
-C_PER_M = float(sys.argv[5]) * m.pow(10, -9)
+LENGTH = 0.0 #float(sys.argv[4])
+C_PER_M = 0.0 #float(sys.argv[5]) * m.pow(10, -9)
+PERIODS = 0
 
 volt_h = 0  # wave overshoot 0 to l
 volt_r = 0 # wave overshoot l to 0
@@ -22,6 +27,7 @@ def f(t):
     global volt_r
     global volt_0
     global volt_l
+    global result
 
     
     if t == 0:
@@ -46,8 +52,6 @@ def f(t):
         print("UR", volt_r)
         return result
 
-#TODO So umschreiben, dass die Rechtecke mit hoher x achsenauflösung
-# richtig angezeigt werden
 def simulate_func(func, x_start, x_end, ylim, xlabel, ylabel):
     fig, ax = plt.subplots()       # a figure with a single Axes
 
@@ -69,21 +73,23 @@ def simulate_func(func, x_start, x_end, ylim, xlabel, ylabel):
             if(x > 0): hl[x] = h[x-1]
 
 
-    #line = ax.plot(t[0], h[0])[0]
     ax.set(xlim=[x_start, x_end], ylim=[0, ylim], xlabel=xlabel, ylabel=ylabel)
 
-    #def update(frame):
-    #    line.set_xdata(t)
-    #    line.set_ydata(h)
-
-    #ani = animation.FuncAnimation(fig=fig, func=update, frames=200, interval=10)
     ax.grid(True)
     plt.step(t, h0, where='post', label="V at l = 0")
     plt.step(t, hl, where='post', label="V at l = l")
     plt.legend()
-    plt.show()                           # Show the figure.
+    plt.show()
+    
+    #canvas = FigureCanvasTKAgg(fig, master=root)
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-#TODO kontrollieren(eventuell fehler)
+    del t
+    del h
+    del h0
+    del hl
+
 # calculates the reflected wave overshoot or undershoot
 def reflected_wave_overshoot(voltage, reflect_res, wave_res):
     reflection_fak = (reflect_res - wave_res) / (reflect_res + wave_res)
@@ -99,5 +105,90 @@ def reflection_time(wave_res, length, capacity_per_meter):
     return wave_res * length * capacity_per_meter
 
 
+def get_user_input():
+    frame = tk.Frame(root)
+    frame.pack(fill="both", expand=True)
+    parameters = [
+        ("Voltage", "V"),
+        ("Wave Resistor", "Ω"),
+        ("Reflection Resistor 1", "Ω"),
+        ("Reflection Resistor 2", "Ω"),
+        ("Length", "m"),
+        ("Capacity per m", "pF/m"),
+        ("Periods", ""),
+    ]
 
-simulate_func(f, 0, 10, 8.0, "T in " + str(reflection_time(WAVE_RES, LENGTH, C_PER_M)), 'Spannung in V')
+
+    def validate(string):
+        result = re.match(r"(\+|\-)?\d+(,\d+)?$", string)
+        return result is not None
+
+    vcmd = (root.register(validate), "%P")
+
+    entries = {}
+    for row, (label, unit) in enumerate(parameters):
+        print("test")
+        tk.Label(frame, text=f"{label}:").grid(
+            row=row, column=0, sticky="e", padx=5, pady=5
+        )
+    
+        entry = tk.Entry(frame, validate="key", validatecommand=vcmd)
+        entry.grid(row=row, column=1, sticky="ew", padx=5, pady=5)
+    
+        tk.Label(frame, text=unit).grid(
+            row=row, column=2, sticky="w", padx=5, pady=5
+        )
+        entries[label] = entry
+    
+        def show_wave():
+            for param, entry in entries.items():
+                value = entry.get()
+                global VOLTAGE, WAVE_RES, REFLECT_RES_0, REFLECT_RES_l, LENGTH, C_PER_M, PERIODS
+                match param:
+                    case "Voltage":
+                        VOLTAGE = float(value)
+                    case "Wave Resistor":
+                        WAVE_RES = float(value)
+                    case "Reflection Resistor 1":
+                        REFLECT_RES_0 = float(value)
+                    case "Reflection Resistor 2":
+                        REFLECT_RES_l = float(value)
+                    case "Length":
+                        LENGTH = float(value)
+                    case "Capacity per m":
+                        C_PER_M = float(value)
+                    case "Periods":
+                        PERIODS = float(value)
+                    case _:
+                        print(Failed)
+
+            print(VOLTAGE)
+            print(WAVE_RES)
+            print(REFLECT_RES_0)
+            print(REFLECT_RES_l)
+            print(LENGTH)
+            print(C_PER_M)
+            print(PERIODS)
+
+
+            global volt_h
+            global volt_r
+            global volt_0
+            global volt_l
+            global result
+            
+            volt_h = 0 
+            volt_r = 0
+            volt_0 = 0
+            volt_l = 0
+            result = 0
+
+
+            simulate_func(f, 0, 10, 8.0, "T in " + str(reflection_time(WAVE_RES, LENGTH, C_PER_M)), 'Spannung in V')
+
+        tk.Button(frame, text="Submit", command=show_wave).grid(
+            row=len(parameters), column=1, pady=10
+        )
+    
+    root.mainloop()
+get_user_input()

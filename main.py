@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 import wave_simulation as ws
+import subprocess
+import sys
 
 
 def create_input_fields():
@@ -19,7 +21,7 @@ def create_input_fields():
         ("Reflection Resistor 2", "Ω"),
         ("Length", "m"),
         ("Capacity per m", "pF/m"),
-        ("Periods", ""),  # No unit for periods
+        ("Periods", ""),
     ]
 
     # Create validation command
@@ -58,7 +60,7 @@ def create_input_fields():
 
     # Add submit button
     def show_values():
-        ws.simulate_func()
+        #ws.simulate_func()
         for param, entry in entries.items():
             value = entry.get()
             print(f"{param}: {value if value else 'Empty'}")
