@@ -102,7 +102,7 @@ def new_voltage(old_volt, wave_diff, res, wave_res):
     return old_volt + wave_diff * (1+reflection_fak)
 
 def reflection_time(wave_res, length, capacity_per_meter):
-    return wave_res * length * capacity_per_meter
+    return wave_res * length * capacity_per_meter * 10e-4
 
 
 def get_user_input():
@@ -184,7 +184,7 @@ def get_user_input():
             result = 0
 
 
-            simulate_func(f, 0, 10, 8.0, "T in " + str(reflection_time(WAVE_RES, LENGTH, C_PER_M)), 'Spannung in V')
+            simulate_func(f, 0, PERIODS, 8.0, "T in " + str(reflection_time(WAVE_RES, LENGTH, C_PER_M)) + " ns", 'Spannung in V')
 
         tk.Button(frame, text="Submit", command=show_wave).grid(
             row=len(parameters), column=1, pady=10
