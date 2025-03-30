@@ -8,7 +8,7 @@ venv\Scripts\activate # für windows systeme
 
 pip install -r requirements.txt
 
-tkinter muss eventuell extra installiert werden, für ubuntu:
+tkinter muss extra und global installiert werden, für ubuntu:
 sudo apt-get install python3-tk
 
 start:

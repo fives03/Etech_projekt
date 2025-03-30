@@ -11,7 +11,7 @@ pyparsing==3.2.1
 PyQt6==6.8.0
 PyQt6-Qt6==6.8.1
 PyQt6_sip==13.9.1
-PySimpleGUI==5.0.8
+PySimpleGUI
 python-dateutil==2.9.0.post0
 rsa==4.9
 six==1.17.0

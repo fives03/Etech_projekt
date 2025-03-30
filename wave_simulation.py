@@ -8,12 +8,12 @@ import re
 
 root = tk.Tk()
 
-VOLTAGE = 0.0 #float(sys.argv[1]) # the initial Voltage the experiment starts with
-WAVE_RES = 0.0 #float(sys.argv[2]) # wave resintance of the test setup
-REFLECT_RES_0 = 0.0 #int(sys.argv[3]) # the resistence at the start of the measuring range
+VOLTAGE = 0.0 # the initial Voltage the experiment starts with
+WAVE_RES = 0.0 # wave resintance of the test setup
+REFLECT_RES_0 = 0.0 # the resistence at the start of the measuring range
 REFLECT_RES_l = 9*10e100 # the resistence at the end of the measuring range
-LENGTH = 0.0 #float(sys.argv[4])
-C_PER_M = 0.0 #float(sys.argv[5]) * m.pow(10, -9)
+LENGTH = 0.0 
+C_PER_M = 0.0 
 PERIODS = 0
 
 volt_h = 0  # wave overshoot 0 to l
@@ -21,7 +21,8 @@ volt_r = 0 # wave overshoot l to 0
 volt_0 = 0 # voltage at beginning of the measureing range
 volt_l = 0 # voltage at the end of the measuring range
 
-#TODO eventuell lokal implementieren
+debugmode = false
+
 def f(t):
     global volt_h
     global volt_r
@@ -34,26 +35,29 @@ def f(t):
         volt_h = VOLTAGE * WAVE_RES/(REFLECT_RES_0 + WAVE_RES)
         volt_0 = VOLTAGE * WAVE_RES/(REFLECT_RES_0 + WAVE_RES)
         result = VOLTAGE * WAVE_RES/(REFLECT_RES_0 + WAVE_RES)
-        print("U0", result)
-        print("UH", volt_h)
+        if debugmode:
+            print("U0", result)
+            print("UH", volt_h)
         return result
     if t % 2 == 0:
         volt_h = reflected_wave_overshoot(volt_r, REFLECT_RES_0, WAVE_RES)
         result = new_voltage(volt_0, volt_r, REFLECT_RES_0, WAVE_RES)
         volt_0 = result
-        print("U0", result)
-        print("UH", volt_h)
+        if debugmode:
+            print("U0", result)
+            print("UH", volt_h)
         return result
     else:
         volt_r = reflected_wave_overshoot(volt_h, REFLECT_RES_l, WAVE_RES)
         result = new_voltage(volt_l, volt_h, REFLECT_RES_l, WAVE_RES)
         volt_l = result
-        print("Ul", result)
-        print("UR", volt_r)
+        if debugmode:
+            print("Ul", result)
+            print("UR", volt_r)
         return result
 
 def simulate_func(func, x_start, x_end, ylim, xlabel, ylabel):
-    fig, ax = plt.subplots()       # a figure with a single Axes
+    fig, ax = plt.subplots()
 
 
     t = np.arange(x_end + 1.0)
@@ -81,7 +85,6 @@ def simulate_func(func, x_start, x_end, ylim, xlabel, ylabel):
     plt.legend()
     plt.show()
     
-    #canvas = FigureCanvasTKAgg(fig, master=root)
     canvas.draw()
     canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
@@ -127,7 +130,6 @@ def get_user_input():
 
     entries = {}
     for row, (label, unit) in enumerate(parameters):
-        print("test")
         tk.Label(frame, text=f"{label}:").grid(
             row=row, column=0, sticky="e", padx=5, pady=5
         )
