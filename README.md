@@ -9,7 +9,9 @@ python3 -m venv venv
 
 ```bash
 source venv/bin/activate # für linux/mac systeme
-venv\Scripts\activate # für windows systeme
+```
+```bash
+venv\Scripts\Activate.ps1 # für windows systeme
 ```
 
 ```bash
