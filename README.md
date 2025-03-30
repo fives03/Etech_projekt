@@ -30,3 +30,9 @@ python3 wave_simulation.py
 
 
 
+In meinem Projekt habe ich die aus der Vorlesung bekannten Reflektionen von Spannungswellen auf
+parallelen Reitern betrachtet. Ziel war es die Spannung am Anfang und am Ende des Leiters zu
+plotten und mit verschiedenen Wiederständen zu berechnen. Dabei ist es möglich einen
+Reflektionswiederstand und einen Spannungsquellenwiederstand einzustellen. Ich habe zunächst
+damit gestartet die Berechnungen vorzunehmen und diese in Funktionen zu verpacken. Dannach
+habe ich mich mit dem Plotten der Daten beschäftigt und eine Input GUI gebaut.

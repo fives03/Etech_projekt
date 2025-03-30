@@ -15,13 +15,14 @@ REFLECT_RES_l = 9*10e100 # the resistence at the end of the measuring range
 LENGTH = 0.0 
 C_PER_M = 0.0 
 PERIODS = 0
+PLOTVOLTAGE_RANGE = 0
 
 volt_h = 0  # wave overshoot 0 to l
 volt_r = 0 # wave overshoot l to 0
 volt_0 = 0 # voltage at beginning of the measureing range
 volt_l = 0 # voltage at the end of the measuring range
 
-debugmode = false
+debugmode = False
 
 def f(t):
     global volt_h
@@ -85,9 +86,6 @@ def simulate_func(func, x_start, x_end, ylim, xlabel, ylabel):
     plt.legend()
     plt.show()
     
-    canvas.draw()
-    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
     del t
     del h
     del h0
@@ -114,11 +112,12 @@ def get_user_input():
     parameters = [
         ("Voltage", "V"),
         ("Wave Resistor", "Ω"),
-        ("Reflection Resistor 1", "Ω"),
-        ("Reflection Resistor 2", "Ω"),
+        ("Reflection Resistor l=0", "Ω"),
+        ("Reflection Resistor l=l", "Ω"),
         ("Length", "m"),
         ("Capacity per m", "pF/m"),
         ("Periods", ""),
+        ("Plotvoltage range", "V"),
     ]
 
 
@@ -145,15 +144,15 @@ def get_user_input():
         def show_wave():
             for param, entry in entries.items():
                 value = entry.get()
-                global VOLTAGE, WAVE_RES, REFLECT_RES_0, REFLECT_RES_l, LENGTH, C_PER_M, PERIODS
+                global VOLTAGE, WAVE_RES, REFLECT_RES_0, REFLECT_RES_l, LENGTH, C_PER_M, PERIODS, PLOTVOLTAGE_RANGE
                 match param:
                     case "Voltage":
                         VOLTAGE = float(value)
                     case "Wave Resistor":
                         WAVE_RES = float(value)
-                    case "Reflection Resistor 1":
+                    case "Reflection Resistor l=0":
                         REFLECT_RES_0 = float(value)
-                    case "Reflection Resistor 2":
+                    case "Reflection Resistor l=l":
                         REFLECT_RES_l = float(value)
                     case "Length":
                         LENGTH = float(value)
@@ -161,16 +160,17 @@ def get_user_input():
                         C_PER_M = float(value)
                     case "Periods":
                         PERIODS = float(value)
-                    case _:
-                        print(Failed)
+                    case "Plotvoltage range":
+                        PLOTVOLTAGE_RANGE = float(value)
 
-            print(VOLTAGE)
-            print(WAVE_RES)
-            print(REFLECT_RES_0)
-            print(REFLECT_RES_l)
-            print(LENGTH)
-            print(C_PER_M)
-            print(PERIODS)
+            if debugmode:
+                print(VOLTAGE)
+                print(WAVE_RES)
+                print(REFLECT_RES_0)
+                print(REFLECT_RES_l)
+                print(LENGTH)
+                print(C_PER_M)
+                print(PERIODS)
 
 
             global volt_h
@@ -186,7 +186,7 @@ def get_user_input():
             result = 0
 
 
-            simulate_func(f, 0, PERIODS, 8.0, "T in " + str(reflection_time(WAVE_RES, LENGTH, C_PER_M)) + " ns", 'Spannung in V')
+            simulate_func(f, 0, PERIODS, PLOTVOLTAGE_RANGE, "T in " + str(reflection_time(WAVE_RES, LENGTH, C_PER_M)) + " ns", 'Spannung in V')
 
         tk.Button(frame, text="Submit", command=show_wave).grid(
             row=len(parameters), column=1, pady=10
